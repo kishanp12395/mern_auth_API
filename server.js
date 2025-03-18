@@ -24,7 +24,7 @@ app.use(cors({
 
 
 //APi Endpoints
-app.get('/',(req,res)=> res.send("API Working."));
+// app.get('/',(req,res)=> res.send("API Working."));
 
 app.use('/api/auth', userRouter)
 
