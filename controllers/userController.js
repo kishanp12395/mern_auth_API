@@ -12,25 +12,32 @@ export const getUserData = async (req,res) => {
     try { 
 
         const {userId} = req.body;
+
+        // Validate userId
         if (!userId) {
-            return res.status(400).json({ success: false, msg: 'User ID is required' });
+            return res.status(400).json({ success: false, msg: '❌ User ID is required' });
         }
 
+         // Fetch user by ID
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, msg: 'User not found' });
+            return res.status(404).json({ success: false, msg: '❌ User not found' });
         }
 
-        return res.status(200).json({ success: true, 
-            userData:{
+        // Return user-specific data
+        return res.status(200).json({ 
+            success: true, 
+            msg: '✅ User data fetched successfully.',
+            userData: {
                 name: user.name,
+                email: user.email, // Optional: Include if you want
                 isAccountVerified: user.isAccountVerified
-        } 
-    });
+            } 
+        });
 
     } catch (error) {
         console.error('❌ Error fetching user data:', error.message);
-        return res.status(500).json({ success: false, msg: 'Internal Server Error' });   
+        return res.status(500).json({ success: false, msg: '🚨 Internal Server Error. Please try again.' });   
     }
 }
 
@@ -51,6 +58,8 @@ export const userRegister = async (req, res) => {
             return res.status(400).json({ success: false, msg: 'All fields are required' });
         }
 
+        //also add email regex
+
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -61,23 +70,28 @@ export const userRegister = async (req, res) => {
         if (password.length < 6) {
             return res.status(400).json({ success: false, msg: 'Password must be at least 6 characters long' });
         }
+        //also add password regex
 
          // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create new user instance
-        const newUser = new User({
+        const user = new User({
             name,
             email,
             password: hashedPassword,
         });
 
         // Save user to database
-        await newUser.save();
+        await user.save();
 
         // Generate JWT token
-        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign(
+            { id: user._id }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '7d' }
+        );
 
         // Set HTTP-only cookie with token
         res.cookie('token', token, {
@@ -99,15 +113,18 @@ export const userRegister = async (req, res) => {
             success: true,
             msg: 'User registered successfully',
             user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
+                id: user._id,
+                name: user.name,
+                email: user.email,
             },
         });
 
     } catch (error) {
-        console.error('Error in user registration:', error.message);
-        return res.status(500).json({ success: false, msg: 'Internal Server Error' });
+        console.error('❌ Registration Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            msg: 'Internal Server Error. Please try again later.'
+        });
     }
 };
 
@@ -129,7 +146,7 @@ export const loginUser = async (req, res) => {
         // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ success: false, msg: 'Invalid credentials' });
+            return res.status(401).json({ success: false, msg: 'Invalid credentials' });
         }
 
         // Compare password with hashed password
@@ -162,8 +179,11 @@ export const loginUser = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error in user login:', error.message);
-        return res.status(500).json({ success: false, msg: 'Internal Server Error' });
+        console.error('❌ Login Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            msg: 'Internal Server Error. Please try again later.'
+        });
     }
 };
 
@@ -172,6 +192,7 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
 
     try {
+        // Clear the token cookie
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -183,8 +204,11 @@ export const logoutUser = async (req, res) => {
         return res.status(200).json({ success: true, msg: 'Logout successful' });
 
     } catch (error) {
-        console.error('Error in user logout:', error.message);
-        return res.status(500).json({ success: false, msg: 'Internal Server Error' });
+        console.error('❌ Logout Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            msg: 'Internal Server Error. Please try again later.'
+        });
     }
 }
 
@@ -215,35 +239,44 @@ export const sendVerifyOtp = async (req, res) => {
 
            await user.save();
 
-           sendOtpOnEmail(otp, user.email)
+            sendOtpOnEmail(otp, user.email)
            return res.status(200).json({ success: true, msg: "OTP sent successfully." });
 
     } catch (error) {
-        console.error("❌ Error sending OTP:", error.message);
-        return res.status(500).json({ success: false, msg: "Internal Server Error" });
+        console.error('❌  Error in sending OTP:', error.message);
+        return res.status(500).json({
+            success: false,
+            msg: 'Internal Server Error. Please try again later.'
+        });
     }
 } 
 
 
 //verify email using otp
 export const verifyemail = async (req, res) => {
-    const {userId, otp} = req.body;
-
-    if(!userId || !otp) {
-        return res.status(400).json({success: false, msg: 'Missing Details'})
-    }
     
     try {
 
+        const {userId, otp} = req.body;
+    
+        //validation
+        if(!userId || !otp) {
+            return res.status(400).json({success: false, msg: 'Missing Details'})
+        }
+        
         const user = await User.findById(userId);
+
+        //check if user exists
         if(!user){
             return res.status(404).json({success: false, msg: 'User Not Found'});
         }
         
+        // Check OTP validity
         if(user.verifyOtp == '' || user.verifyOtp !== otp){
             return res.status(400).json({success: false, msg: 'Invalid OTP'})
         }
 
+        // OTP Expiry check
         if(user.verifyOtpExpireAt < Date.now()){
             return res.status(400).json({ success: false, msg: "OTP has expired" });
         }
@@ -255,10 +288,12 @@ export const verifyemail = async (req, res) => {
 
 
          await user.save();
-         return res.status(200).json({ success: true, msg: "Email verified successfully" });
+
+         return res.status(200).json({ success: true, msg: "Account verified successfully" });
 
     } catch (error) {
-        return res.status(500).json({success: false, msg: 'Internal Server error'})
+        console.error('❌ Error in verifying OTP:', error.message);
+        return res.status(500).json({ success: false, msg: 'Internal Server Error. Please try again later.' });
     }
 }
 
@@ -267,15 +302,15 @@ export const verifyemail = async (req, res) => {
 export const isAuthenticated = async (req, res) => {
     try {
         // Check if userId is available (set by authentication middleware)
-        if (!req.body.userId) {
+        if (!req.user || !req.user.id) {
             return res.status(401).json({ success: false, msg: "Unauthorized. Please log in." });
         }
 
-        return res.json({
+        return res.status(200).json({
             success: true,
-            msg: "User is authenticated",
-            userId: req.body.userId, // Optionally return user ID
-        });
+            msg: "✅ User is authenticated",
+            userId: req.user.id, // Optionally returning user ID
+        }); //1.56
 
     } catch (error) {
         console.error("❌ Error checking authentication:", error.message);
@@ -289,30 +324,36 @@ export const isAuthenticated = async (req, res) => {
 export const sendResetOtp = async (req,res) => {
     const {email} = req.body;
 
+    // Input validation
     if(!email){
-        return res.status(400).json ({success: false, msg: 'Email is required'})
+        return res.status(400).json ({success: false, msg: '📧 Email is required'})
     }
 
     try {
-
+        // Check if user exists
         const user = await User.findOne({email});
         if(!user){
-            return res.status(404).json({success: false, msg: 'User not found'})
+            return res.status(404).json({success: false, msg: '❌ User not found with this email'})
         }
 
+        // Generate 6-digit OTP
         const otp =  String(Math.floor(100000 + Math.random() * 900000));
 
+        
+        // Store OTP and expiry (15 min)
            user.resetOtp = otp;
            user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000;
 
            await user.save();
 
+          // Send OTP on email
            sendResetOtpOnEmail(otp, user.email)
-           return res.status(200).json({ success: true, msg: "OTP sent successfully." });
+           return res.status(200).json({ success: true, msg: "✅ OTP sent successfully." });
 
         
     } catch (error) {
-        return res.status(500).json({ success: false, msg: "Internal Server Error" });
+        console.error("❌ Error sending reset OTP:", error.message);
+        return res.status(500).json({ success: false, msg: "Internal Server Error. Please try again later." });
     }
 }
 
@@ -321,26 +362,31 @@ export const sendResetOtp = async (req,res) => {
 export const resetPassword = async (req,res) => {
     const {email, otp, newPassword} = req.body;
 
+     // Input validation
     if(!email || !otp || !newPassword){
-        return res.status(400).json({success: false, msg: 'Invalid credentials'})
+        return res.status(400).json({success: false, msg: '❌ Email, OTP, and new password are required.'})
     }
 
     try {
-
+        // Check if user exists
         const user = await User.findOne({email});
         if(!user){
-            return res.status(404).json({success: false, msg: 'User not found'})
+            return res.status(404).json({success: false, msg: '❌ No user found with this email.'})
         }
 
+        // Validate OTP
         if(user.resetOtp === "" || user.resetOtp !== otp){
-            return res.status(400).json({ success: false, msg: 'Invalid OTP' });
+            return res.status(400).json({ success: false, msg: '❌ Invalid or incorrect OTP.' });
         }
         
 
+        // Check OTP expiry
         if(user.resetOtpExpireAt < Date.now()){
-            return res.status(400).json({ success: false, msg: 'OTP expired' });
+            return res.status(400).json({ success: false, msg: '❌ OTP has expired. Please request a new one.' });
         }
 
+        
+        // Hash new password securely
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
@@ -351,11 +397,11 @@ export const resetPassword = async (req,res) => {
 
          await user.save();
 
-         return res.status(200).json({ success: true, msg: 'Password reset successful' });
+         return res.status(200).json({ success: true, msg: '✅ Password has been reset successfully. You can now log in.' });
 
     } catch (error) {
         console.error('❌ Error resetting password:', error.message);
-        return res.status(500).json({ success: false, msg: 'Internal Server Error' });
+        return res.status(500).json({ success: false, msg: '🚨 Internal Server Error. Please try again.' });
     }
 }
 
