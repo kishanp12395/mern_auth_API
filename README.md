@@ -1,30 +1,35 @@
 
-# 📌 MERN Authentication API Documentation
+# 🚀 MERN Authentication API - Complete Documentation
 
-Base URL (Live):  
-`https://mern-auth-bepd.onrender.com/api/auth`
+✅ **Live API Base URL:**  
+[https://mern-auth-bepd.onrender.com/api/auth](https://mern-auth-bepd.onrender.com/api/auth)
 
-This API provides authentication features including registration, login, logout, email verification (via OTP), and password reset functionality.
+This RESTful API provides secure authentication features including user registration, login, logout, email verification (OTP-based), and password reset functionality.
 
 ---
 
-## 🚀 **Setup (For Local Development)**
+## 🛠 **Local Development Setup**
 ```bash
 git clone https://github.com/kishanp12395/mern_auth.git
 cd server
 npm install
 npm start
 ```
-Base URL (Local): `http://localhost:4000/api/auth`
+- 📍 Local API Base URL: `http://localhost:4000/api/auth`
 
 ---
 
-## 🛠 **API Endpoints**
+## 📌 **Authentication Flow Overview**
+✅ Register → ✅ Login → ✅ (Optional) Verify Email → ✅ Access Protected Routes → ✅ Password Reset
 
-## ✅ **1. User Registration**
-**URL:** `/register`  
-**Method:** `POST`  
-**Body:**
+---
+
+## 📚 **Endpoints Detailed Guide**
+
+### 1️⃣ **Register User**
+- **URL:** `/register`
+- **Method:** `POST`
+- **Body Example:**
 ```json
 {
   "name": "John Doe",
@@ -32,158 +37,156 @@ Base URL (Local): `http://localhost:4000/api/auth`
   "password": "yourpassword"
 }
 ```
-**Description:** Registers a new user.
+- **Purpose:** Create a new user account.
 
 ---
 
-## ✅ **2. User Login**
-**URL:** `/login`  
-**Method:** `POST`  
-**Body:**
+### 2️⃣ **Login User**
+- **URL:** `/login`
+- **Method:** `POST`
+- **Body Example:**
 ```json
 {
   "email": "johndoe@example.com",
   "password": "yourpassword"
 }
 ```
-**Description:** Logs in the user and sets a token cookie.
+- **Purpose:** Authenticate user and receive JWT token in cookies.
 
 ---
 
-## ✅ **3. User Logout**
-**URL:** `/logout`  
-**Method:** `POST`  
-**Description:** Logs out the user by clearing the token cookie.
+### 3️⃣ **Logout User**
+- **URL:** `/logout`
+- **Method:** `POST`
+- **Purpose:** Clear token cookies to log the user out.
 
 ---
 
-## ✅ **4. Get Authenticated User Data**
-**URL:** `/data`  
-**Method:** `GET`  
-**Headers:**
-```
-Authorization: Bearer <your-jwt-token>
-```
-**Description:** Returns the authenticated user’s data.
+### 4️⃣ **Get Authenticated User Data**
+- **URL:** `/data`
+- **Method:** `GET`
+- **Header:** `Authorization: Bearer <JWT_TOKEN>`
+- **Purpose:** Fetch details of the currently authenticated user.
 
 ---
 
-## ✅ **5. Check Authentication**
-**URL:** `/is-auth`  
-**Method:** `GET`  
-**Headers:**
-```
-Authorization: Bearer <your-jwt-token>
-```
-**Description:** Checks if the user is authenticated.
+### 5️⃣ **Check if User is Authenticated**
+- **URL:** `/is-auth`
+- **Method:** `GET`
+- **Header:** `Authorization: Bearer <JWT_TOKEN>`
+- **Purpose:** Validate user session/token.
 
 ---
 
-## ✅ **6. Send Email Verification OTP**
-**URL:** `/send-otp`  
-**Method:** `POST`  
-**Headers:**
-```
-Authorization: Bearer <your-jwt-token>
-```
-**Description:** Sends OTP to the registered email for verification.
+### 6️⃣ **Send Email Verification OTP**
+- **URL:** `/send-otp`
+- **Method:** `POST`
+- **Header:** `Authorization: Bearer <JWT_TOKEN>`
+- **Purpose:** Send verification OTP to the registered email.
 
 ---
 
-## ✅ **7. Verify Email Using OTP**
-**URL:** `/verify-email`  
-**Method:** `POST`  
-**Headers:**
-```
-Authorization: Bearer <your-jwt-token>
-```
-**Body:**
+### 7️⃣ **Verify Email using OTP**
+- **URL:** `/verify-email`
+- **Method:** `POST`
+- **Header:** `Authorization: Bearer <JWT_TOKEN>`
+- **Body Example:**
 ```json
 {
   "otp": "123456"
 }
 ```
-**Description:** Verifies the email using OTP.
+- **Purpose:** Verify user's email with OTP.
 
 ---
 
-## ✅ **8. Send Password Reset OTP**
-**URL:** `/send-reset-otp`  
-**Method:** `POST`  
-**Body:**
+### 8️⃣ **Send Password Reset OTP**
+- **URL:** `/send-reset-otp`
+- **Method:** `POST`
+- **Body Example:**
 ```json
 {
   "email": "johndoe@example.com"
 }
 ```
-**Description:** Sends OTP to the user’s email for password reset.
+- **Purpose:** Send OTP to user's email for password reset.
 
 ---
 
-## ✅ **9. Reset Password**
-**URL:** `/reset-password`  
-**Method:** `POST`  
-**Body:**
+### 9️⃣ **Reset Password with OTP**
+- **URL:** `/reset-password`
+- **Method:** `POST`
+- **Body Example:**
 ```json
 {
   "email": "johndoe@example.com",
   "otp": "123456",
-  "newPassword": "newpassword123"
+  "newPassword": "newSecurePassword123"
 }
 ```
-**Description:** Resets the password if the OTP is verified.
+- **Purpose:** Reset the password using a valid OTP.
 
 ---
 
-## 🔐 **Authentication**
-For protected routes, include the token:
+## 🔐 **Token-Based Authentication Info**
+- Add this header to access protected routes:
 ```
 Authorization: Bearer <your-jwt-token>
 ```
-- Token is provided in cookies or returned by the login route.
-- Frontend should store it securely (e.g., httpOnly cookie or state).
+- Token is sent as an HTTP-only cookie upon login for security.
+- Store tokens securely on the frontend.
 
 ---
 
-## 📬 **Response Example (Success)**
+## ✅ **Standard Success Response Example**
 ```json
 {
   "success": true,
   "message": "Operation completed successfully.",
-  "data": { ... }
+  "data": { }
 }
 ```
 
-## ⚠️ **Response Example (Error)**
+## ⚠️ **Standard Error Response Example**
 ```json
 {
   "success": false,
-  "message": "Invalid credentials."
+  "message": "Invalid credentials or expired OTP."
 }
 ```
 
 ---
 
-## 🌐 **Deployment**
-✅ Live API is deployed on Render:  
-👉 `https://mern-auth-bepd.onrender.com/api/auth`
+## 📊 **API Endpoints Summary Table**
+| #  | Endpoint            | Method | Protected 🔐 | Description                      |
+|----|---------------------|-------|-------------|----------------------------------|
+| 1️⃣ | /register           | POST  | ❌          | Register a new user              |
+| 2️⃣ | /login              | POST  | ❌          | Login user                       |
+| 3️⃣ | /logout             | POST  | ❌          | Logout user                      |
+| 4️⃣ | /data               | GET   | ✅          | Get authenticated user data      |
+| 5️⃣ | /is-auth            | GET   | ✅          | Check authentication status      |
+| 6️⃣ | /send-otp           | POST  | ✅          | Send email verification OTP      |
+| 7️⃣ | /verify-email       | POST  | ✅          | Verify email with OTP            |
+| 8️⃣ | /send-reset-otp     | POST  | ❌          | Send OTP for password reset      |
+| 9️⃣ | /reset-password     | POST  | ❌          | Reset password with OTP          |
 
 ---
 
-## 📄 **Summary**
-| Endpoint              | Method | Auth | Description                             |
-|-----------------------|-------|------|-----------------------------------------|
-| `/register`           | POST  | ❌   | Register user                           |
-| `/login`              | POST  | ❌   | Login user                              |
-| `/logout`             | POST  | ❌   | Logout user                             |
-| `/data`               | GET   | ✅   | Get user data                           |
-| `/is-auth`            | GET   | ✅   | Check authentication status             |
-| `/send-otp`           | POST  | ✅   | Send email verification OTP             |
-| `/verify-email`       | POST  | ✅   | Verify email using OTP                  |
-| `/send-reset-otp`     | POST  | ❌   | Send OTP for password reset             |
-| `/reset-password`     | POST  | ❌   | Reset password with OTP                 |
+## 🌐 **Deployment Info**
+✅ API Live: [https://mern-auth-bepd.onrender.com/api/auth](https://mern-auth-bepd.onrender.com/api/auth)
 
 ---
 
-## 🤝 **Contributing**
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## 🤝 **Contribution Guidelines**
+- Contributions, feature requests, and pull requests are welcome!
+- For major changes, open an issue first to discuss what you would like to change.
+
+---
+
+## 📩 **Contact Developer**
+- GitHub: [https://github.com/kishanp12395](https://github.com/kishanp12395)
+- Email: kishanp12395@example.com
+
+---
+
+⭐ **Thank you for using this MERN Authentication API!** ⭐
