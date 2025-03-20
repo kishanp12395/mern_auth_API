@@ -10,12 +10,12 @@ This API provides authentication features including registration, login, logout,
 
 ## 🚀 **Setup (For Local Development)**
 ```bash
-git clone <repository-url>
-cd <project-directory>
+git clone https://github.com/kishanp12395/mern_auth.git
+cd server
 npm install
 npm start
 ```
-Base URL (Local): `http://localhost:<PORT>/api/auth`
+Base URL (Local): `http://localhost:4000/api/auth`
 
 ---
 
