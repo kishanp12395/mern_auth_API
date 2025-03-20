@@ -197,11 +197,11 @@ export const logoutUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
-            expires: new Date(0), // Expire immediately
+            //expires: new Date(0),
             path: '/',
         });
 
-        return res.status(200).json({ success: true, msg: 'Logout successful' });
+        return res.status(200).json({ success: true, msg: '📤Logout successful' });
 
     } catch (error) {
         console.error('❌ Logout Error:', error.message);
