@@ -18,6 +18,25 @@ npm start
 - 📍 Local API Base URL: `http://localhost:4000/api/auth`
 
 ---
+## 📊 **API Endpoints Summary Table**
+| #  | Endpoint            | Method | Protected 🔐 | Description                      |
+|----|---------------------|-------|-------------|----------------------------------|
+| 1️⃣ | /register           | POST  | ❌          | Register a new user              |
+| 2️⃣ | /login              | POST  | ❌          | Login user                       |
+| 3️⃣ | /logout             | POST  | ❌          | Logout user                      |
+| 4️⃣ | /data               | GET   | ✅          | Get authenticated user data      |
+| 5️⃣ | /is-auth            | GET   | ✅          | Check authentication status      |
+| 6️⃣ | /send-otp           | POST  | ✅          | Send email verification OTP      |
+| 7️⃣ | /verify-email       | POST  | ✅          | Verify email with OTP            |
+| 8️⃣ | /send-reset-otp     | POST  | ❌          | Send OTP for password reset      |
+| 9️⃣ | /reset-password     | POST  | ❌          | Reset password with OTP          |
+
+---
+
+## 🌐 **Deployment Info**
+✅ API Live: [https://mern-auth-bepd.onrender.com/api/auth](https://mern-auth-bepd.onrender.com/api/auth)
+---
+
 
 ## 📌 **Authentication Flow Overview**
 ✅ Register → ✅ Login → ✅ (Optional) Verify Email → ✅ Access Protected Routes → ✅ Password Reset
@@ -157,23 +176,7 @@ Authorization: Bearer <your-jwt-token>
 
 ---
 
-## 📊 **API Endpoints Summary Table**
-| #  | Endpoint            | Method | Protected 🔐 | Description                      |
-|----|---------------------|-------|-------------|----------------------------------|
-| 1️⃣ | /register           | POST  | ❌          | Register a new user              |
-| 2️⃣ | /login              | POST  | ❌          | Login user                       |
-| 3️⃣ | /logout             | POST  | ❌          | Logout user                      |
-| 4️⃣ | /data               | GET   | ✅          | Get authenticated user data      |
-| 5️⃣ | /is-auth            | GET   | ✅          | Check authentication status      |
-| 6️⃣ | /send-otp           | POST  | ✅          | Send email verification OTP      |
-| 7️⃣ | /verify-email       | POST  | ✅          | Verify email with OTP            |
-| 8️⃣ | /send-reset-otp     | POST  | ❌          | Send OTP for password reset      |
-| 9️⃣ | /reset-password     | POST  | ❌          | Reset password with OTP          |
 
----
-
-## 🌐 **Deployment Info**
-✅ API Live: [https://mern-auth-bepd.onrender.com/api/auth](https://mern-auth-bepd.onrender.com/api/auth)
 
 ---
 
